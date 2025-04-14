@@ -11,15 +11,9 @@ simple_routes = Blueprint('simple_routes', __name__)
 # / is the most basic route
 # Once the api container is started, in a browser, go to 
 # localhost:4000/playlist
-@simple_routes.route('/')
-def welcome():
-    current_app.logger.info('GET / handler')
-    welcome_message = '<h1>Welcome to the CS 3200 Project Template REST API'
-    response = make_response(welcome_message)
-    response.status_code = 200
-    return response
 
-@simple_routes.route('/strava')
+
+@simple_routes.route('/')
 def get_strava_data():
     #html info about strava
     current_app.logger.info('GET /strava route')
@@ -30,15 +24,19 @@ def get_strava_data():
     return response
 
 
-@simple_routes.route('/strava/users')
-def get_strava_users():
+@simple_routes.route('/leaderboard', methods=['GET'])
+def get_leaderboard():
     cursor = db.get_db().cursor()
-    cursor.execute('''SELECT * FROM users
+    cursor.execute('''SELECT * FROM leaderboard
     ''')
-    
-    theData = cursor.fetchall()
-    
-    the_response = make_response(jsonify(theData))
-    the_response.status_code = 200
-    return the_response
 
+    # Python Dictionary
+    theData = cursor.fetchall()
+
+    # Create a HTTP Response object and add results of the query to it
+    # after "jasonify"-ing it.
+    response = make_response(jsonify(theData))
+    # set the proper HTTP Status code of 200 (meaning all good)
+    response.status_code = 200
+    # send the response back to the client
+    return response

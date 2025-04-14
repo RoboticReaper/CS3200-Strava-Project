@@ -19,30 +19,26 @@ def welcome():
     response.status_code = 200
     return response
 
-# ------------------------------------------------------------
-# /playlist returns the sample playlist data contained in playlist.py
-# (imported above)
-@simple_routes.route('/playlist')
-def get_playlist_data():
-    current_app.logger.info('GET /playlist handler')
-    response = make_response(jsonify(sample_playlist_data))
+@simple_routes.route('/strava')
+def get_strava_data():
+    #html info about strava
+    current_app.logger.info('GET /strava route')
+    strava_info = '<h1>Strava API</h1>'
+    strava_info += '<p>Strava API is a third-party API that provides access to fitness data.</p>'
+    response = make_response(strava_info)
     response.status_code = 200
     return response
 
-# ------------------------------------------------------------
-@simple_routes.route('/niceMesage', methods = ['GET'])
-def affirmation():
-    message = '''
-    <H1>Think about it...</H1>
-    <br />
-    You only need to be 1% better today than you were yesterday!
-    '''
-    response = make_response(message)
-    response.status_code = 200
-    return response
 
-# ------------------------------------------------------------
-# Demonstrates how to redirect from one route to another. 
-@simple_routes.route('/message')
-def mesage():
-    return redirect(url_for(affirmation))
+@simple_routes.route('/strava/users')
+def get_strava_users():
+    cursor = db.get_db().cursor()
+    cursor.execute('''SELECT * FROM users
+    ''')
+    
+    theData = cursor.fetchall()
+    
+    the_response = make_response(jsonify(theData))
+    the_response.status_code = 200
+    return the_response
+

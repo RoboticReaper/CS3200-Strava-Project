@@ -1,27 +1,23 @@
-FROM python:3.11-slim
+# Use official Node.js image
+FROM node:20-alpine
 
-WORKDIR /appcode
+# Set working directory
+WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-  build-essential \
-  curl \
-  software-properties-common \
-  git \
-  && rm -rf /var/lib/apt/lists/*
+# Copy package.json and package-lock.json first for caching
+COPY package*.json ./
 
-# RUN mkdir /requirements
-# COPY ./src/requirements.txt /requirements/requirements.txt
+# Install dependencies
+RUN npm install
 
-COPY ./src/requirements.txt .
+# Copy the rest of your Next.js app
+COPY . .
 
-RUN pip3 install -r requirements.txt
+# Build the Next.js app
+RUN npm run build
 
-RUN ls
+# Expose port used by Next.js
+EXPOSE 3000
 
-EXPOSE 8501
-
-# HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
-
-# ENTRYPOINT ["streamlit", "run", "src/Home.py", "--server.port=8501", "--server.address=0.0.0.0"] 
-
-CMD ["streamlit", "run", "Home.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Start the app
+CMD ["npm", "start"]

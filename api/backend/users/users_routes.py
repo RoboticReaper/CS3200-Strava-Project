@@ -89,3 +89,8 @@ def get_user_by_id(user_id):
         user_data['is_flagged'],
         user_data['id']
     ))
+    db.get_db().commit()
+
+    response = make_response(jsonify({'message': 'User updated successfully'}))
+    response.status_code = 200
+    return response

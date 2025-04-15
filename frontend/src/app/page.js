@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import Button from '@mui/material/Button';
+import { useSearchParams } from 'next/navigation';
 
 function getUserFromID(user_id){
   return fetch(`http://localhost:4000/users/${user_id}`).then(res => res.json()).then(data => data[0]);
@@ -13,6 +13,9 @@ export default function Home() {
 
   const [leaderboard, setLeaderboard] = useState([]);
   const [runs, setRuns] = useState([]);
+
+  const searchParams = useSearchParams();
+  const routeId = searchParams.get('userid') || null;
 
   useEffect(() => {
     fetch("http://localhost:4000/leaderboard")
@@ -48,9 +51,8 @@ export default function Home() {
         <Link href="/runs" className="underline font-semibold">See recent runs →</Link>
         <Link href="/feed" className="underline font-semibold">Go to Feed →</Link>
         <Link href="/leaderboard" className="underline font-semibold">View Leaderboard →</Link>
+        <Link href="/signin" className="underline font-semibold">Sign In/Sign Up →</Link>
       </div>
-
-      <Button>Test</Button>
 
       <section>
         <h2 className="font-bold mb-2">🏅 Leaderboard (Top 3)</h2>

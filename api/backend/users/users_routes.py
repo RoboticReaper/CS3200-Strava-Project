@@ -74,7 +74,7 @@ def get_user_by_id(user_id):
 
 
 # Update user details by id
-@users.route('/<int:user_id>', methods=['PATCH'])
+@users.route('/<int:user_id>', methods=['PUT'])
 def get_user_by_id(user_id):
     user_data = request.json
     cursor = db.get_db().cursor()
@@ -87,7 +87,7 @@ def get_user_by_id(user_id):
         user_data['email'],
         user_data['profile_hidden'],
         user_data['is_flagged'],
-        user_data['id']
+        user_id
     ))
     db.get_db().commit()
 

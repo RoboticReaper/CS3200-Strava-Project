@@ -9,8 +9,13 @@ from backend.alerts.alerts_routes import alerts
 import os
 from dotenv import load_dotenv
 
+from flask_cors import CORS
+
+
+
 def create_app():
     app = Flask(__name__)
+    CORS(app)
 
     # Load environment variables
     # This function reads all the values from inside

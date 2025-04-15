@@ -53,3 +53,57 @@ def get_run(user_id, run_id):
     # send the response back to the client
     return response
 
+@runs.route('/', methods=['POST'])
+def create_run():
+    run_data = request.json
+    cursor = db.get_db().cursor()
+    cursor.execute('''
+        INSERT INTO run (user_id, distance, duration, time, calories, avg_pace)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    ''', (
+        run_data['user_id'],
+        run_data['distance'],
+        run_data['duration'],
+        run_data['time'],
+        run_data['calories'],
+        run_data['avg_pace']
+    ))
+    db.get_db().commit()
+    response = make_response(jsonify({'message': 'Run created successfully'}))
+    response.status_code = 201
+    return response
+
+@runs.route('/<int:user_id>/<int:run_id>', methods=['PUT'])
+def update_run(user_id, run_id):
+    run_data = request.json
+    cursor = db.get_db().cursor()
+    cursor.execute('''
+        UPDATE run 
+        SET distance = %s,
+            duration = %s,
+            time = %s,
+            calories = %s,
+            avg_pace = %s
+        WHERE id = %s AND user_id = %s
+    ''', (
+        run_data['distance'],
+        run_data['duration'],
+        run_data['time'],
+        run_data['calories'],
+        run_data['avg_pace'],
+        run_id,
+        user_id
+    ))
+    db.get_db().commit()
+    response = make_response(jsonify({'message': 'Run updated successfully'}))
+    response.status_code = 200
+    return response
+
+@runs.route('/<int:user_id>/<int:run_id>', methods=['DELETE'])
+def delete_run(user_id, run_id):
+    cursor = db.get_db().cursor()
+    cursor.execute('DELETE FROM run WHERE id = %s AND user_id = %s', (run_id, user_id))
+    db.get_db().commit()
+    response = make_response(jsonify({'message': 'Run deleted successfully'}))
+    response.status_code = 200
+    return response

@@ -87,3 +87,91 @@ def get_single_comment(post_id, comment_id):
     response.status_code = 200
     # send the response back to the client
     return response
+
+@posts.route('/', methods=['POST'])
+def create_post():
+    post_data = request.json
+    cursor = db.get_db().cursor()
+    cursor.execute('''
+        INSERT INTO posts (user_id, title, content, post_flair)
+        VALUES (%s, %s, %s, %s)
+    ''', (
+        post_data['user_id'],
+        post_data['title'],
+        post_data['content'],
+        post_data['post_flair']
+    ))
+    db.get_db().commit()
+    response = make_response(jsonify({'message': 'Post created successfully'}))
+    response.status_code = 201
+    return response
+
+@posts.route('/<int:post_id>/comments', methods=['POST'])
+def create_comment(post_id):
+    comment_data = request.json
+    cursor = db.get_db().cursor()
+    cursor.execute('''
+        INSERT INTO comments (post_id, user_id, content)
+        VALUES (%s, %s, %s)
+    ''', (post_id, comment_data['user_id'], comment_data['content']))
+    db.get_db().commit()
+    response = make_response(jsonify({'message': 'Comment created successfully'}))
+    response.status_code = 201
+    return response
+
+@posts.route('/<int:post_id>', methods=['PUT'])
+def update_post(post_id):
+    post_data = request.json
+    cursor = db.get_db().cursor()
+    cursor.execute('''
+        UPDATE posts 
+        SET title = %s,
+            content = %s,
+            post_flair = %s
+        WHERE id = %s
+    ''', (
+        post_data['title'],
+        post_data['content'],
+        post_data['post_flair'],
+        post_id
+    ))
+    db.get_db().commit()
+    response = make_response(jsonify({'message': 'Post updated successfully'}))
+    response.status_code = 200
+    return response
+
+@posts.route('/<int:post_id>', methods=['DELETE'])
+def delete_post(post_id):
+    cursor = db.get_db().cursor()
+    cursor.execute('DELETE FROM posts WHERE id = %s', (post_id,))
+    db.get_db().commit()
+    response = make_response(jsonify({'message': 'Post deleted successfully'}))
+    response.status_code = 200
+    return response
+
+@posts.route('/<int:post_id>/comments/<int:comment_id>', methods=['PUT'])
+def update_comment(post_id, comment_id):
+    comment_data = request.json
+    cursor = db.get_db().cursor()
+    cursor.execute('''
+        UPDATE comments 
+        SET content = %s
+        WHERE id = %s AND post_id = %s
+    ''', (
+        comment_data['content'],
+        comment_id,
+        post_id
+    ))
+    db.get_db().commit()
+    response = make_response(jsonify({'message': 'Comment updated successfully'}))
+    response.status_code = 200
+    return response
+
+@posts.route('/<int:post_id>/comments/<int:comment_id>', methods=['DELETE'])
+def delete_comment(post_id, comment_id):
+    cursor = db.get_db().cursor()
+    cursor.execute('DELETE FROM comments WHERE id = %s AND post_id = %s', (comment_id, post_id))
+    db.get_db().commit()
+    response = make_response(jsonify({'message': 'Comment deleted successfully'}))
+    response.status_code = 200
+    return response

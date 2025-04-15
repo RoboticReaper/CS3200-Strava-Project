@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Button from '@mui/material/Button';
 
 function getUserFromID(user_id){
   return fetch(`http://localhost:4000/users/${user_id}`).then(res => res.json()).then(data => data[0]);
@@ -48,6 +49,8 @@ export default function Home() {
         <Link href="/feed" className="underline font-semibold">Go to Feed →</Link>
         <Link href="/leaderboard" className="underline font-semibold">View Leaderboard →</Link>
       </div>
+
+      <Button>Test</Button>
 
       <section>
         <h2 className="font-bold mb-2">🏅 Leaderboard (Top 3)</h2>

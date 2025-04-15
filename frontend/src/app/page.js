@@ -41,7 +41,7 @@ export default function Home() {
 
   return (
     <main className="max-w-xl mx-auto p-8 space-y-8">
-      <h1 className="text-3xl font-bold mb-2 text-center">🏃‍♂️ Welcome to RunCrew!</h1>
+      <h1 className="text-3xl font-bold mb-2 text-center">🏃‍♂️ Welcome to Strava!</h1>
       
       <div className="flex flex-col gap-4">
         <Link href="/runs" className="underline font-semibold">See recent runs →</Link>

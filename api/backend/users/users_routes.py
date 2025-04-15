@@ -35,6 +35,26 @@ def get_users():
     return response
 
 
+# Create users
+@users.route('/', methods=['POST'])
+def get_users():
+    user_data = request.json
+    cursor = db.get_db().cursor()
+    cursor.execute('''INSERT INTO users (first_name, last_name, email)
+                   VALUES (%s, %s, %s)
+    ''', (
+        user_data['first_name'],
+        user_data['last_name'],
+        user_data['email'],
+    ))
+
+    db.get_db().commit()
+
+    response = make_response(jsonify({'message': 'User created successfully'}))
+    response.status_code = 201
+    return response
+
+
 # Get users by id
 @users.route('/<int:user_id>', methods=['GET'])
 def get_user_by_id(user_id):
@@ -51,3 +71,21 @@ def get_user_by_id(user_id):
     response.status_code = 200
     # send the response back to the client
     return response
+
+
+# Update user details by id
+@users.route('/<int:user_id>', methods=['PATCH'])
+def get_user_by_id(user_id):
+    user_data = request.json
+    cursor = db.get_db().cursor()
+    cursor.execute('''UPDATE users
+                   SET first_name = %s, last_name = %s, email = %s, profile_hidden = %s, is_flagged = %s
+                   WHERE id = %s
+    ''', (
+        user_data['first_name'],
+        user_data['last_name'],
+        user_data['email'],
+        user_data['profile_hidden'],
+        user_data['is_flagged'],
+        user_data['id']
+    ))

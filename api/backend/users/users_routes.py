@@ -37,7 +37,7 @@ def get_users():
 
 # Create users
 @users.route('/', methods=['POST'])
-def get_users():
+def create_users():
     user_data = request.json
     cursor = db.get_db().cursor()
     cursor.execute('''INSERT INTO users (first_name, last_name, email)
@@ -75,7 +75,7 @@ def get_user_by_id(user_id):
 
 # Update user details by id
 @users.route('/<int:user_id>', methods=['PUT'])
-def get_user_by_id(user_id):
+def update_user_by_id(user_id):
     user_data = request.json
     cursor = db.get_db().cursor()
     cursor.execute('''UPDATE users

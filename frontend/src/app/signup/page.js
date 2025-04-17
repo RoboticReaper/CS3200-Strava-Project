@@ -21,7 +21,33 @@ export default function SignUp() {
         }
         setIsLoading(true)
 
-        // yet to implement api request
+        const userData = {
+            first_name: firstName, // Ensure keys match the backend expectation
+            last_name: lastName,
+            email: email
+        };
+
+        fetch('http://localhost:4000/users/', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        }).then(res => {
+            if (res.status === 201) {
+                router.push("/signin")
+            } else {
+                alert("Error creating user.");
+            }
+        }).catch(err => {
+            console.error("Error creating user", err);
+            alert("Error creating user.");
+        }).finally(() => {
+            setIsLoading(false);
+            setFirstName('');
+            setLastName('');
+            setEmail('');
+        })
     }
 
     return (

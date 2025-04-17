@@ -38,7 +38,7 @@ def get_users():
 # Create users
 @users.route('/', methods=['POST'])
 def create_users():
-    user_data = request.json
+    user_data = request.get_json()
     cursor = db.get_db().cursor()
     cursor.execute('''INSERT INTO users (first_name, last_name, email)
                    VALUES (%s, %s, %s)

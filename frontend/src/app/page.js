@@ -129,9 +129,9 @@ export default function Home() {
                         </tr>
                       </thead>
                       <tbody>
-                        {leaderboard.slice(0, 5).map((u) => (
-                          <tr key={u.rank} className="hover:bg-gray-light">
-                            <td className="font-medium">{u.rank}</td>
+                        {leaderboard.slice(0, 5).map((u, i) => (
+                          <tr key={i} className="hover:bg-gray-light">
+                            <td className="font-medium">{i+1}</td>
                             <td>{userNames[u.user_id] || `User ${u.user_id}`}</td>
                             <td>{u.total_distance} km</td>
                           </tr>
@@ -150,7 +150,7 @@ export default function Home() {
           ) : (
             // Content shown when no user is logged in
             <div className="text-center strava-card py-10">
-              <h1 className="text-3xl font-bold mb-4">Welcome to Strava Clone</h1>
+              <h1 className="text-3xl font-bold mb-4">Welcome to Strava!</h1>
               <p className="text-gray-medium mb-6">Track your runs, connect with friends, and hit your goals.</p>
               <div className="space-x-4">
                  <Link href="/signup" className="btn-strava">Sign Up</Link>

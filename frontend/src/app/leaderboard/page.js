@@ -28,7 +28,7 @@ export default function Leaderboard() {
         });
 
         const leaderboardData = data.map((u, i) => ({
-          rank: u.rank,
+          rank: i + 1,
           name: userMap[u.user_id],
           dist: u.total_distance,
           time: u.total_time,
@@ -51,19 +51,6 @@ export default function Leaderboard() {
                 See how you stack up against other athletes
               </p>
             </div>
-            <div className="flex gap-4">
-              <select className="px-4 py-2 border rounded-md bg-white">
-                <option>This Week</option>
-                <option>This Month</option>
-                <option>This Year</option>
-                <option>All Time</option>
-              </select>
-              <select className="px-4 py-2 border rounded-md bg-white">
-                <option>Running</option>
-                <option>Cycling</option>
-                <option>Swimming</option>
-              </select>
-            </div>
           </div>
           <div className="strava-card">
             <table className="min-w-full">
@@ -79,13 +66,7 @@ export default function Leaderboard() {
                 {data.map((u) => (
                   <tr key={u.rank} className="hover:bg-gray-light">
                     <td className="font-medium">
-                      {u.rank <= 3 ? (
-                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-strava-orange text-white">
-                          {u.rank}
-                        </span>
-                      ) : (
-                        u.rank
-                      )}
+                      {u.rank}
                     </td>
                     <td>
                       <div className="flex items-center gap-3">
@@ -100,8 +81,8 @@ export default function Leaderboard() {
                         </div>
                       </div>
                     </td>
-                    <td className="text-right font-medium">{u.dist} km</td>
-                    <td className="text-right font-medium">{u.time} min</td>
+                    <td className="text-left font-medium">{u.dist} km</td>
+                    <td className="text-left font-medium">{u.time} min</td>
                   </tr>
                 ))}
               </tbody>

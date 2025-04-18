@@ -27,7 +27,7 @@ def get_strava_data():
 @simple_routes.route('/leaderboard', methods=['GET'])
 def get_leaderboard():
     cursor = db.get_db().cursor()
-    cursor.execute('''SELECT * FROM leaderboard
+    cursor.execute('''SELECT * FROM leaderboard ORDER BY total_distance DESC
     ''')
 
     # Python Dictionary
@@ -40,3 +40,40 @@ def get_leaderboard():
     response.status_code = 200
     # send the response back to the client
     return response
+
+@simple_routes.route('/leaderboard', methods=['PUT'])
+def update_leaderboard():
+    current_app.logger.info('PUT /leaderboard route')
+    
+    # Get data from request JSON
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+
+    user_id = data.get('user_id')
+    total_distance = data.get('total_distance')
+    total_time = data.get('total_time')
+
+    if user_id is None or total_distance is None or total_time is None:
+        return jsonify({"error": "Missing required fields: user_id, total_distance, total_time"}), 400
+
+    try:
+        cursor = db.get_db().cursor()
+        
+        # Update existing record - assumes user_id exists
+        cursor.execute('''
+            UPDATE leaderboard 
+            SET total_distance = %s, total_time = %s 
+            WHERE user_id = %s
+        ''', (total_distance, total_time, user_id))
+
+        db.get_db().commit()
+        
+        response = make_response(jsonify({"message": "Leaderboard updated successfully"}))
+        response.status_code = 200
+        return response
+
+    except Exception as e:
+        db.get_db().rollback()
+        current_app.logger.error(f"Error updating leaderboard: {e}")
+        return jsonify({"error": "Failed to update leaderboard"}), 500

@@ -35,12 +35,9 @@ export default function SignIn() {
     }, [])
 
     return (
-        <main className="max-w-lg mx-auto p-8">
+        <main className="max-w-lg mx-auto p-8 pt-20">
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'baseline' }}>
-                <h1 className="text-2xl font-bold">Sign In</h1>
-                <div className="text-sm text-gray-500 italic mb-4">
-                    <Link href="/" className="underline font-semibold">Home →</Link>
-                </div>
+                <h1 className="text-2xl font-bold mb-3">Sign In</h1>
             </div>
             <section className="pb-4 flex flex-col gap-3">
                 <TextField id="userid" value={userId} onChange={(e) => { setUserId(e.target.value) }} label="User ID" required fullWidth />

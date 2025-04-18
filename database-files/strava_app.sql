@@ -48,7 +48,6 @@ CREATE TABLE IF NOT EXISTS heart_rate_alerts (
 CREATE TABLE IF NOT EXISTS leaderboard (
  id INT PRIMARY KEY AUTO_INCREMENT,
  user_id INT NOT NULL,
- `rank` INT NOT NULL,
  total_distance FLOAT NOT NULL,
  total_time FLOAT NOT NULL,
  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -151,11 +150,11 @@ VALUES
  (3, 160, 0);
 
 
-INSERT INTO leaderboard (user_id, `rank`, total_distance, total_time)
+INSERT INTO leaderboard (user_id, total_distance, total_time)
 VALUES
- (1, 1, 15.5, 90.0),
- (2, 2, 12.3, 85.0),
- (3, 3, 10.0, 75.0);
+ (1, 15.5, 90.0),
+ (2, 12.3, 85.0),
+ (3, 10.0, 75.0);
 
 
 INSERT INTO posts (user_id, title, content, post_flair)

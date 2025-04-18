@@ -33,30 +33,40 @@ export default function SignUp() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(userData)
-        }).then(res => {
+        }).then(async res => { // Make the callback async to use await for parsing JSON
             if (res.status === 201) {
-                router.push("/signin")
+                const data = await res.json(); // Parse the JSON response body
+                const newUserId = data.id; // Assuming the backend returns { id: new_user_id }
+                if (newUserId) {
+                    router.push(`/?userid=${newUserId}`); // Redirect to home page with user ID
+                } else {
+                    console.error("User created, but ID not returned from API.");
+                    alert("Sign up successful, but failed to log in automatically. Please sign in manually.");
+                    router.push("/signin"); // Fallback to signin page
+                }
             } else {
-                alert("Error creating user.");
+                // Handle potential errors like duplicate email, etc.
+                const errorData = await res.json().catch(() => ({})); // Try to parse error message
+                console.error("Error creating user:", res.status, errorData);
+                alert(`Error creating user: ${errorData.message || 'Please try again.'}`);
             }
         }).catch(err => {
             console.error("Error creating user", err);
-            alert("Error creating user.");
+            alert("Error creating user. Check console for details.");
         }).finally(() => {
             setIsLoading(false);
-            setFirstName('');
-            setLastName('');
-            setEmail('');
+            // Clear fields only if not redirecting immediately or handle state differently
+            // If redirecting, clearing might not be necessary or visible
+            // setFirstName('');
+            // setLastName('');
+            // setEmail('');
         })
     }
 
     return (
-        <main className="max-w-lg mx-auto p-8">
+        <main className="max-w-lg mx-auto p-8 pt-20">
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'baseline'}}>
-                <h1 className="text-2xl font-bold mb-1">Sign Up</h1>
-                <div className="text-sm text-gray-500 italic mb-1">
-                    <Link href="/" className="underline font-semibold">Home →</Link>
-                </div>
+                <h1 className="text-2xl font-bold mb-3">Sign Up</h1>
             </div>
             <section className="pb-4">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

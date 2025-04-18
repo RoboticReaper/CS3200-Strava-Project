@@ -38,15 +38,35 @@ def get_groups():
 @groups.route('/', methods=['POST'])
 def create_group():
     group_data = request.json
+    name = group_data.get('name')
+    description = group_data.get('description')
+
+    if not name:
+        return make_response(jsonify({'message': 'Group name is required'}), 400)
+
     cursor = db.get_db().cursor()
-    cursor.execute('''INSERT INTO `groups` (name, description)
-                   VALUES (%s, %s)
-                   ''', (group_data['name'], group_data['description']))
-    
-    db.get_db().commit()
-    response = make_response(jsonify({'message': 'Group created successfully'}))
-    response.status_code = 201
-    return response
+    try:
+        cursor.execute('''INSERT INTO `groups` (name, description)
+                       VALUES (%s, %s)
+                       ''', (name, description))
+        
+        new_group_id = cursor.lastrowid # Get the ID of the inserted row
+        db.get_db().commit()
+        
+        response_data = {
+            'message': 'Group created successfully',
+            'new_group_id': new_group_id # Include the new ID in the response
+        }
+        response = make_response(jsonify(response_data))
+        response.status_code = 201
+        return response
+    except Exception as e:
+        db.get_db().rollback() # Rollback in case of error
+        # Check for duplicate entry error (adjust error code/message as needed for your DB)
+        if 'Duplicate entry' in str(e):
+             return make_response(jsonify({'message': f'Group name "{name}" already exists.'}), 409) # Conflict
+        current_app.logger.error(f"Error creating group: {e}")
+        return make_response(jsonify({'message': 'Error creating group'}), 500)
 
 # Get group by group_id
 @groups.route('/<int:group_id>', methods=['GET'])

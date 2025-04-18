@@ -37,7 +37,7 @@ export default function Navbar({ }) {
                                 Feed
                             </Link>
                             <Link href={userId ? `/runs?userid=${userId}` : "/runs"} className="nav-link">
-                                Training
+                                Run
                             </Link>
                             <Link href={userId ? `/leaderboard?userid=${userId}` : "/leaderboard"} className="nav-link">
                                 Leaderboard

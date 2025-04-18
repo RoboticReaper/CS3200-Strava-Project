@@ -40,19 +40,36 @@ def get_users():
 def create_users():
     user_data = request.get_json()
     cursor = db.get_db().cursor()
-    cursor.execute('''INSERT INTO users (first_name, last_name, email)
-                   VALUES (%s, %s, %s)
-    ''', (
-        user_data['first_name'],
-        user_data['last_name'],
-        user_data['email'],
-    ))
+    
+    try:
+        # Insert into users table
+        cursor.execute('''INSERT INTO users (first_name, last_name, email)
+                       VALUES (%s, %s, %s)
+        ''', (
+            user_data['first_name'],
+            user_data['last_name'],
+            user_data['email'],
+        ))
+        
+        # Get the ID of the newly created user
+        new_user_id = cursor.lastrowid
+        
+        # Insert into leaderboard table with default values
+        cursor.execute('''INSERT INTO leaderboard (user_id, total_distance, total_time)
+                       VALUES (%s, 0, 0)
+        ''', (new_user_id,))
 
-    db.get_db().commit()
+        db.get_db().commit()
 
-    response = make_response(jsonify({'message': 'User created successfully'}))
-    response.status_code = 201
-    return response
+        # Return the new user ID in the format expected by the frontend
+        response = make_response(jsonify({'id': new_user_id}))
+        response.status_code = 201
+        return response
+        
+    except Exception as e:
+        db.get_db().rollback() # Rollback in case of error
+        current_app.logger.error(f"Error creating user: {e}")
+        return jsonify({"error": "Failed to create user"}), 500
 
 
 # Get users by id

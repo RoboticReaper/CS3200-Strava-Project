@@ -90,6 +90,24 @@ def get_user_by_id(user_id):
     return response
 
 
+# Get groups for a specific user
+@users.route('/<int:user_id>/groups', methods=['GET'])
+def get_user_groups(user_id):
+    cursor = db.get_db().cursor()
+    cursor.execute('''SELECT group_id FROM group_membership WHERE user_id = %s
+                   ''', (user_id,))
+
+    # Fetch all results (list of tuples)
+    results = cursor.fetchall()
+    
+    # Extract the group_id from each tuple to create a list of integers
+    group_ids = [item['group_id'] for item in results]
+
+    response = make_response(jsonify(group_ids))
+    response.status_code = 200
+    return response
+
+
 # Update user details by id
 @users.route('/<int:user_id>', methods=['PUT'])
 def update_user_by_id(user_id):

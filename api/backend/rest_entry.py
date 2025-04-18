@@ -7,6 +7,7 @@ from backend.simple.simple_routes import simple_routes
 from backend.posts.posts_routes import posts
 from backend.alerts.alerts_routes import alerts
 from backend.hidden.hidden_routes import hidden
+from backend.groups.groups_routes import groups
 import os
 from dotenv import load_dotenv
 
@@ -53,6 +54,7 @@ def create_app():
     app.register_blueprint(posts, url_prefix='/posts')
     app.register_blueprint(alerts, url_prefix='/alerts')
     app.register_blueprint(hidden, url_prefix='/hidden')
+    app.register_blueprint(groups, url_prefix='/groups')
 
 
     # Don't forget to return the app object

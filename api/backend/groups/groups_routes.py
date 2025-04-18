@@ -20,7 +20,7 @@ groups = Blueprint('groups', __name__)
 @groups.route('/', methods=['GET'])
 def get_groups():
     cursor = db.get_db().cursor()
-    cursor.execute('''SELECT * FROM groups
+    cursor.execute('''SELECT * FROM `groups`
                    ''')
 
     # Python Dictionary
@@ -39,7 +39,7 @@ def get_groups():
 def create_group():
     group_data = request.json
     cursor = db.get_db().cursor()
-    cursor.execute('''INSERT INTO groups (name, description)
+    cursor.execute('''INSERT INTO `groups` (name, description)
                    VALUES (%s, %s)
                    ''', (group_data['name'], group_data['description']))
     
@@ -52,7 +52,7 @@ def create_group():
 @groups.route('/<int:group_id>', methods=['GET'])
 def get_group_by_id(group_id):
     cursor = db.get_db().cursor()
-    cursor.execute('''SELECT * FROM groups WHERE id = %s
+    cursor.execute('''SELECT * FROM `groups` WHERE id = %s
                    ''', (group_id))
 
     # Python Dictionary
@@ -76,8 +76,7 @@ def get_group_members(group_id):
     # Python Dictionary
     theData = cursor.fetchall()
 
-    member_ids = [item[0] for item in theData]
-    response = make_response(jsonify(member_ids))
+    response = make_response(jsonify(theData))
     # set the proper HTTP Status code of 200 (meaning all good)
     response.status_code = 200
     # send the response back to the client

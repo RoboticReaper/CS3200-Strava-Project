@@ -3,7 +3,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function Navbar({}) {
+function getUserFromID(user_id) {
+    return fetch(`http://localhost:4000/users/${user_id}`)
+        .then((res) => res.json())
+        .then((data) => data[0]);
+}
+
+export default function Navbar({ }) {
     const [currentUser, setCurrentUser] = useState(null);
 
     const searchParams = useSearchParams();
@@ -12,8 +18,10 @@ export default function Navbar({}) {
     useEffect(() => {
         if (userId) {
             getUserFromID(userId).then((user) => setCurrentUser(user));
+        } else {
+            setCurrentUser(null); // Clear user if no userId in URL
         }
-    }, []);
+    }, [userId]); // Add userId as a dependency
 
 
     return (
@@ -21,18 +29,20 @@ export default function Navbar({}) {
             <div className="max-w-7xl mx-auto px-4">
                 <div className="flex justify-between h-16">
                     <div className="flex items-center">
-                        <h1 className="text-2xl font-bold text-strava-orange">STRAVA</h1>
+                        <Link href={userId ? `/?userid=${userId}` : "/"}>
+                            <h1 className="text-2xl font-bold text-strava-orange">STRAVA</h1>
+                        </Link>
                         <div className="ml-10 flex space-x-4">
-                            <Link href="/feed" className="nav-link">
+                            <Link href={userId ? `/feed?userid=${userId}` : "/feed"} className="nav-link">
                                 Feed
                             </Link>
-                            <Link href="/runs" className="nav-link">
+                            <Link href={userId ? `/runs?userid=${userId}` : "/runs"} className="nav-link">
                                 Training
                             </Link>
-                            <Link href="/leaderboard" className="nav-link">
+                            <Link href={userId ? `/leaderboard?userid=${userId}` : "/leaderboard"} className="nav-link">
                                 Leaderboard
                             </Link>
-                            <Link href="/groups" className="nav-link">
+                            <Link href={userId ? `/groups?userid=${userId}` : "/groups"} className="nav-link">
                                 Groups
                             </Link>
                         </div>
@@ -43,6 +53,7 @@ export default function Navbar({}) {
                                 <span className="text-gray-medium">
                                     Welcome, {currentUser.first_name}!
                                 </span>
+                                {/* Log out should redirect to the home page without the user ID */}
                                 <Link href="/" className="btn-strava">
                                     Log Out
                                 </Link>

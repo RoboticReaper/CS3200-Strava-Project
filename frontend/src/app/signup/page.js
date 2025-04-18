@@ -1,8 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -65,43 +63,48 @@ export default function SignUp() {
 
     return (
         <main className="max-w-lg mx-auto p-8 pt-20">
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'baseline'}}>
-                <h1 className="text-2xl font-bold mb-3">Sign Up</h1>
+            <div className="flex gap-4 items-baseline mb-6">
+                <h1 className="text-2xl font-bold">Sign Up</h1>
             </div>
             <section className="pb-4">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <TextField
+                {/* Use standard form elements with Tailwind classes */}
+                <form onSubmit={(e) => { e.preventDefault(); signUp(); }} className="flex flex-col gap-4">
+                    <input
+                        type="text"
                         id="firstname"
-                        label="First Name"
+                        placeholder="First Name"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
-                        variant="outlined"
-                        fullWidth
+                        className="input border border-gray-300 p-2 rounded w-full"
                         required
+                        disabled={isLoading}
                     />
-                    <TextField
+                    <input
+                        type="text"
                         id="lastname"
-                        label="Last Name"
+                        placeholder="Last Name"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
-                        variant="outlined"
-                        fullWidth
+                        className="input border border-gray-300 p-2 rounded w-full"
                         required
+                        disabled={isLoading}
                     />
-                    <TextField
-                        id="email"
-                        label="Email"
+                    <input
                         type="email"
+                        id="email"
+                        placeholder="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        variant="outlined"
-                        fullWidth
+                        className="input border border-gray-300 p-2 rounded w-full"
                         required
+                        disabled={isLoading}
                     />
-                    <Button variant="contained" onClick={signUp} loading={isLoading}>Sign Up</Button>
-                </div>
-                <div className="text-sm text-gray-500 italic mt-2 text-center">
-                    <Link href="/signin" className="underline font-semibold">Already have an account? Sign In →</Link>
+                    <button type="submit" className="btn-strava w-full" disabled={isLoading}>
+                        {isLoading ? 'Signing Up...' : 'Sign Up'}
+                    </button>
+                </form>
+                <div className="text-sm text-gray-500 italic mt-4 text-center">
+                    <Link href="/signin" className="underline font-semibold hover:text-strava-orange">Already have an account? Sign In →</Link>
                 </div>
             </section>
         </main>

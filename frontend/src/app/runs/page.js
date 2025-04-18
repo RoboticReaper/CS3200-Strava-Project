@@ -232,9 +232,9 @@ export default function RunsPage() {
 
       {/* Modal for Recording Activity */}
       {showModal && (
-        // Remove bg-black bg-opacity-50 for transparent background
-        <div className="fixed inset-0 flex justify-center items-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-300"> {/* Added border to modal itself for visibility */}
+        // Add bg-black bg-opacity-50 and backdrop-blur-sm for blurred background effect
+        <div className="fixed inset-0 flex justify-center items-center z-50 backdrop-blur-sm bg-black/10">
+          <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-300">
             <h2 className="text-xl font-semibold mb-6">Record New Run</h2>
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 gap-4 mb-6">

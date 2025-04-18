@@ -1,6 +1,5 @@
 
 import { Geist, Geist_Mono } from "next/font/google";
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import Navbar from "@/components/navbar/navbar";
 import "./globals.css";
 
@@ -26,10 +25,8 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AppRouterCacheProvider>
           <Navbar />
           {children}
-        </AppRouterCacheProvider>
       </body>
     </html>
   );

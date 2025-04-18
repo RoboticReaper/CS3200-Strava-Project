@@ -54,26 +54,6 @@ CREATE TABLE IF NOT EXISTS leaderboard (
 );
 
 
-CREATE TABLE IF NOT EXISTS posts (
- id INT PRIMARY KEY AUTO_INCREMENT,
- user_id INT NOT NULL,
- title VARCHAR(255) NOT NULL,
- content TEXT NOT NULL,
- post_flair VARCHAR(255) NOT NULL,
- FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE IF NOT EXISTS comments (
- id INT PRIMARY KEY AUTO_INCREMENT,
- post_id INT NOT NULL,
- user_id INT NOT NULL,
- content TEXT NOT NULL,
- FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
- FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-
 CREATE TABLE IF NOT EXISTS `groups` (
  id INT PRIMARY KEY AUTO_INCREMENT,
  name VARCHAR(255) NOT NULL UNIQUE,
@@ -88,6 +68,44 @@ CREATE TABLE IF NOT EXISTS friends (
  status VARCHAR(50) NOT NULL,
  FOREIGN KEY (user_one_id) REFERENCES users(id) ON DELETE CASCADE,
  FOREIGN KEY (user_two_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS posts (
+ id INT PRIMARY KEY AUTO_INCREMENT,
+ user_id INT NOT NULL,
+ title VARCHAR(255) NOT NULL,
+ content TEXT NOT NULL,
+ post_flair VARCHAR(255) NOT NULL,
+ FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS group_posts (
+  post_id INT NOT NULL,
+  group_id INT NOT NULL,
+  PRIMARY KEY (post_id, group_id),
+  FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+  FOREIGN KEY (group_id) REFERENCES `groups`(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS friend_posts (
+  post_id INT NOT NULL,
+  friend_id INT NOT NULL,
+  PRIMARY KEY (post_id, friend_id),
+  FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+  FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS comments (
+ id INT PRIMARY KEY AUTO_INCREMENT,
+ post_id INT NOT NULL,
+ user_id INT NOT NULL,
+ content TEXT NOT NULL,
+ FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+ FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 
@@ -177,6 +195,12 @@ VALUES
  ('Early Birds', 'For those who run early in the morning.'),
  ('Trail Blazers', 'Group for off-road and trail running.');
 
+-- Sample data for group_posts linking posts to groups
+INSERT INTO group_posts (post_id, group_id)
+VALUES
+ (1, 1), -- Post 1 shared with Group 1 (City Runners)
+ (2, 2), -- Post 2 shared with Group 2 (Early Birds)
+ (3, 3); -- Post 3 shared with Group 3 (Trail Blazers)
 
 INSERT INTO friends (user_one_id, user_two_id, status)
 VALUES

@@ -29,19 +29,33 @@ export default function Home() {
     // Fetch global leaderboard data
     fetch("http://localhost:4000/leaderboard")
       .then((res) => res.json())
-      .then(async (data) => {
-        setLeaderboard(data);
-        // Fetch names for leaderboard users
+      .then(async (leaderboardEntries) => {
+        // Fetch details for all users on the initial leaderboard
         const users = await Promise.all(
-          data.map((u) => getUserFromID(u.user_id))
+          leaderboardEntries.map((u) => getUserFromID(u.user_id))
         );
+
+        // Create a map for quick lookup of user details and names
         const userMap = {};
+        const userDetailsMap = {};
         users.forEach((user, i) => {
           if (user) { // Check if user fetch was successful
-             userMap[data[i].user_id] = `${user.first_name} ${user.last_name}`;
+            const entry = leaderboardEntries[i];
+            userMap[entry.user_id] = `${user.first_name} ${user.last_name}`;
+            userDetailsMap[entry.user_id] = user; // Store full user details
           }
         });
-        setUserNames(userMap);
+
+        // Filter leaderboard entries to exclude hidden profiles
+        const filteredEntries = leaderboardEntries.filter(entry => {
+          const user = userDetailsMap[entry.user_id];
+          // Keep if user exists and profile is not hidden
+          return user && !user.profile_hidden;
+        });
+
+        // Update state with filtered leaderboard and corresponding names
+        setLeaderboard(filteredEntries);
+        setUserNames(userMap); // Keep the userMap for names, it's used in rendering
       })
       .catch((err) => console.error("Error fetching leaderboard:", err));
 
@@ -128,15 +142,19 @@ export default function Home() {
                           <th>Distance</th>
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody>{/* Ensure no whitespace before/after map */}
                         {leaderboard.slice(0, 5).map((u, i) => (
-                          <tr key={i} className="hover:bg-gray-light">
-                            <td className="font-medium">{i+1}</td>
-                            <td>{userNames[u.user_id] || `User ${u.user_id}`}</td>
-                            <td>{u.total_distance} km</td>
+                          <tr key={u.user_id} className="hover:bg-gray-light">{/* Ensure no whitespace inside tr */}
+                            <td className="font-medium">{i + 1}</td>{/* Ensure no whitespace inside td */}
+                            <td>{/* Ensure no whitespace inside td */}
+                              <Link href={`/profile?viewUserId=${u.user_id}&userid=${userId}`} className="hover:text-strava-orange">
+                                {userNames[u.user_id] || `User ${u.user_id}`}
+                              </Link>
+                            </td>
+                            <td>{u.total_distance} km</td>{/* Ensure no whitespace inside td */}
                           </tr>
                         ))}
-                      </tbody>
+                      </tbody>{/* Ensure no whitespace before/after map */}
                     </table>
                     <div className="mt-4 text-center">
                        <Link href={userId ? `/leaderboard?userid=${userId}` : "/leaderboard"} className="text-accent-blue hover:underline">

@@ -494,7 +494,10 @@ export default function PostPage() {
                     <span className="text-xl">👤</span> {/* Placeholder */}
                   </div>
                   <div>
-                    <h3 className="font-semibold">{postUserName}</h3>
+                    {/* Wrap post author name in Link */}
+                    <Link href={`/profile?viewUserId=${post.user_id}&userid=${userId}`} className="hover:text-strava-orange hover:underline">
+                      <h3 className="font-semibold">{postUserName}</h3>
+                    </Link>
                     <p className="text-sm text-gray-medium"> {/* Move content inside the p tag */}
                       {post.created_at ? new Date(post.created_at).toLocaleDateString() : 'Date unknown'} • {post.post_flair}
                     </p> {/* Remove the extra closing p tag from here */}
@@ -585,7 +588,10 @@ export default function PostPage() {
                     ) : (
                       // Comment Default View
                       <div>
-                        <span className="font-semibold mr-2">{comment.user_name}:</span>
+                        {/* Wrap commenter name in Link */}
+                        <Link href={`/profile?viewUserId=${comment.user_id}&userid=${userId}`} className="hover:text-strava-orange hover:underline">
+                          <span className="font-semibold mr-2">{comment.user_name}:</span>
+                        </Link>
                         <span>{comment.content}</span>
                         {/* Comment Edit/Delete Buttons */}
                         {currentUserId === comment.user_id && (

@@ -12,34 +12,49 @@ function getUserFromID(user_id) {
 
 export default function Leaderboard() {
   const [data, setData] = useState([]);
-  const [userNames, setUserNames] = useState({});
+  // No longer need userNames state separately if we embed it in data
+  // const [userNames, setUserNames] = useState({});
   const searchParams = useSearchParams(); // Get search params
   const userId = searchParams.get("userid") || null; // Get current logged-in user ID
 
   useEffect(() => {
     fetch("http://localhost:4000/leaderboard")
       .then((res) => res.json())
-      .then(async (data) => {
+      .then(async (leaderboardEntries) => {
+        // Fetch details for all users on the initial leaderboard
         const users = await Promise.all(
-          data.map((u) => getUserFromID(u.user_id))
+          leaderboardEntries.map((u) => getUserFromID(u.user_id))
         );
 
-        const userMap = {};
-        data.forEach((u, i) => {
-          const user = users[i];
-          userMap[u.user_id] = `${user.first_name} ${user.last_name}`;
+        // Create a map for quick lookup of user details by ID
+        const userDetailsMap = {};
+        users.forEach(user => {
+          if (user) { // Ensure user data was fetched successfully
+            userDetailsMap[user.id] = user;
+          }
         });
 
-        const leaderboardData = data.map((u, i) => ({
-          rank: i + 1,
-          user_id: u.user_id, // Add user_id here
-          name: userMap[u.user_id],
-          dist: u.total_distance,
-          time: u.total_time,
-        }));
+        // Filter leaderboard entries to exclude hidden profiles
+        const filteredEntries = leaderboardEntries.filter(entry => {
+          const user = userDetailsMap[entry.user_id];
+          // Keep if user exists and profile is not hidden
+          return user && !user.profile_hidden;
+        });
 
-        setData(leaderboardData);
-        setUserNames(userMap);
+        // Map filtered data and assign new ranks
+        const finalLeaderboardData = filteredEntries.map((u, i) => {
+           const user = userDetailsMap[u.user_id];
+           return {
+                rank: i + 1, // Recalculate rank based on filtered list
+                user_id: u.user_id,
+                name: `${user.first_name} ${user.last_name}`,
+                dist: u.total_distance,
+                time: u.total_time,
+           };
+        });
+
+        setData(finalLeaderboardData);
+        // setUserNames is no longer needed as name is in finalLeaderboardData
       })
       .catch((err) => console.error("Error fetching leaderboard:", err));
   }, []);
@@ -67,13 +82,13 @@ export default function Leaderboard() {
                 </tr>
               </thead>
               <tbody>
-                {data.map((u) => (
+                {data.map((u) => ( // Use the filtered and re-ranked data directly
                   <tr key={u.rank} className="hover:bg-gray-light">
                     <td className="font-medium">
                       {u.rank}
                     </td>
                     <td>
-                      {/* Wrap the div containing the name with Link */}
+                      {/* Link remains the same, using u.user_id and u.name */}
                       <Link href={`/profile?viewUserId=${u.user_id}&userid=${userId}`} className="hover:text-strava-orange">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-gray-light rounded-full flex items-center justify-center">

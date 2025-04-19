@@ -41,6 +41,7 @@ export default function FeedPage() {
   const [commentToDelete, setCommentToDelete] = useState(null); // Stores { postId, commentId }
   const [notification, setNotification] = useState(''); // State for notification message
   const [showNotification, setShowNotification] = useState(false); // State for notification visibility
+  const [showAll, setShowAll] = useState(false); // State to toggle between following feed and all posts
   const searchParams = useSearchParams(); // Get search params
   const userId = searchParams.get('userid'); // Get user_id from URL
   const currentUserId = userId ? parseInt(userId, 10) : null; // Ensure we have the numeric ID for posting comments
@@ -48,9 +49,21 @@ export default function FeedPage() {
 
   // Function to fetch posts (modified slightly for clarity)
   const fetchPosts = () => {
-    if (userId) {
-      setIsLoading(true); // Start loading
-      fetch(`http://localhost:4000/posts?user_id=${userId}`)
+    setIsLoading(true); // Start loading
+    // Determine URL based on toggle state
+    let url = 'http://localhost:4000/posts';
+    if (showAll) {
+      url += '?all=true';
+    } else if (userId) {
+      url += `?user_id=${userId}`;
+    } else {
+      // No user ID and not showing all: clear posts
+      setPosts([]);
+      setIsLoading(false);
+      console.log('No user_id found in URL search params.');
+      return;
+    }
+    fetch(url)
         .then((res) => {
           if (!res.ok) {
             throw new Error(`HTTP error! status: ${res.status}`);
@@ -107,12 +120,6 @@ export default function FeedPage() {
         .finally(() => {
             setIsLoading(false); // Stop loading regardless of outcome
         });
-    } else {
-        // If no userId in URL, set posts to empty and stop loading
-        setPosts([]);
-        setIsLoading(false);
-        console.log("No user_id found in URL search params.");
-    }
   };
 
   // Function to fetch groups the user is a member of
@@ -164,7 +171,7 @@ export default function FeedPage() {
   useEffect(() => {
     fetchPosts(); // Fetch posts on initial load or when userId changes
     fetchUserGroups(); // Fetch groups on initial load or when userId changes
-  }, [userId, searchParams]); // Re-run effect if userId or searchParams change
+  }, [userId, showAll]); // Re-run effect when userId or showAll change
 
   // Handle input changes for the create post form
   const handleInputChange = (e) => {
@@ -517,9 +524,17 @@ export default function FeedPage() {
         <div className="max-w-2xl mx-auto px-4">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-2xl font-bold">Following</h1>
+            <div className="flex items-center space-x-4">
+              <h1 className="text-2xl font-bold">{showAll ? 'All Posts' : 'Following'}</h1>
+              <button
+                onClick={() => setShowAll(!showAll)}
+                className="px-3 py-1 text-sm border rounded hover:bg-gray-200"
+              >
+                {showAll ? 'Show Following' : 'Show All'}
+              </button>
+            </div>
             {userId && ( // Only show button if logged in
-                <button onClick={() => setShowCreatePostModal(true)} className="btn-strava">Create Post</button>
+              <button onClick={() => setShowCreatePostModal(true)} className="btn-strava">Create Post</button>
             )}
           </div>
           {/* Post Rendering Logic */}

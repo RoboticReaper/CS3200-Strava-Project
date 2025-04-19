@@ -38,12 +38,28 @@ def format_datetime_in_data(data):
 @posts.route('/', methods=['GET'])
 def get_posts():
     author_id_str = request.args.get('author_id')
-    user_id_str = request.args.get('user_id') # For feed filtering
+    user_id_str = request.args.get('user_id')  # For feed filtering
+    # 'all' flag to fetch all posts regardless of group
+    all_str = request.args.get('all', '').lower()
 
     cursor = db.get_db().cursor()
     theData = []
 
-    if author_id_str:
+    # If 'all' flag is true, return all posts
+    if all_str == 'true':
+        try:
+            cursor.execute(
+                '''
+                SELECT *
+                FROM posts
+                ORDER BY created_at DESC
+                '''
+            )
+            theData = cursor.fetchall()
+        except Exception as e:
+            current_app.logger.error(f"Error fetching all posts: {e}")
+            return make_response(jsonify({'message': 'Error fetching posts'}), 500)
+    elif author_id_str:
         # Fetch posts by a specific author
         try:
             author_id = int(author_id_str)

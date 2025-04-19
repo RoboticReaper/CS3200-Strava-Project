@@ -63,7 +63,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-light">
-      <main className="pt-20 pb-8">
+      <main className="pb-8">
         <div className="max-w-7xl mx-auto px-4">
           {currentUser ? (
             <>

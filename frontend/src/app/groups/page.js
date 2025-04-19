@@ -203,7 +203,8 @@ export default function Groups() {
   }
 
   return (
-    <main className="max-w-lg mx-auto p-8 pt-20">
+    // Remove pt-20
+    <main className="max-w-lg mx-auto pt-5">
       <div className="flex justify-between items-center mb-4"> {/* Container for title and button */}
         <h1 className="text-2xl font-bold">Running Groups</h1>
         {currentUserId && ( // Only show create button if logged in

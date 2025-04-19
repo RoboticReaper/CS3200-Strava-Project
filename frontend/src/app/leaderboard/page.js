@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation"; // Import useSearchParams
 
 function getUserFromID(user_id) {
   return fetch(`http://localhost:4000/users/${user_id}`)
@@ -12,6 +13,8 @@ function getUserFromID(user_id) {
 export default function Leaderboard() {
   const [data, setData] = useState([]);
   const [userNames, setUserNames] = useState({});
+  const searchParams = useSearchParams(); // Get search params
+  const userId = searchParams.get("userid") || null; // Get current logged-in user ID
 
   useEffect(() => {
     fetch("http://localhost:4000/leaderboard")
@@ -29,6 +32,7 @@ export default function Leaderboard() {
 
         const leaderboardData = data.map((u, i) => ({
           rank: i + 1,
+          user_id: u.user_id, // Add user_id here
           name: userMap[u.user_id],
           dist: u.total_distance,
           time: u.total_time,
@@ -42,7 +46,7 @@ export default function Leaderboard() {
 
   return (
     <div className="min-h-screen bg-gray-light">
-      <main className="pt-20 pb-8">
+      <main className="pb-8">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
             <div>
@@ -69,17 +73,20 @@ export default function Leaderboard() {
                       {u.rank}
                     </td>
                     <td>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gray-light rounded-full flex items-center justify-center">
-                          👤
-                        </div>
-                        <div>
-                          <div className="font-medium">{u.name}</div>
-                          <div className="text-sm text-gray-medium">
-                            Local Legend
+                      {/* Wrap the div containing the name with Link */}
+                      <Link href={`/profile?viewUserId=${u.user_id}&userid=${userId}`} className="hover:text-strava-orange">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gray-light rounded-full flex items-center justify-center">
+                            👤
+                          </div>
+                          <div>
+                            <div className="font-medium">{u.name}</div>
+                            <div className="text-sm text-gray-medium">
+                              Local Legend
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     </td>
                     <td className="text-left font-medium">{u.dist} km</td>
                     <td className="text-left font-medium">{u.time} min</td>

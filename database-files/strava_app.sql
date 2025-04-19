@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS posts (
  title VARCHAR(255) NOT NULL,
  content TEXT NOT NULL,
  post_flair VARCHAR(255) NOT NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Added created_at
  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -104,6 +105,7 @@ CREATE TABLE IF NOT EXISTS comments (
  post_id INT NOT NULL,
  user_id INT NOT NULL,
  content TEXT NOT NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Added created_at
  FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -175,18 +177,18 @@ VALUES
  (3, 10.0, 75.0);
 
 
-INSERT INTO posts (user_id, title, content, post_flair)
+INSERT INTO posts (user_id, title, content, post_flair, created_at)
 VALUES
- (1, 'Morning Run', 'Had a great run today in the park.', 'Motivation'),
- (2, 'Evening Jog', 'Enjoyed an evening jog around the neighborhood.', 'Lifestyle'),
- (3, 'New PR!', 'I set a new personal record in my 5K!', 'Achievement');
+ (1, 'Morning Run', 'Had a great run today in the park.', 'Motivation', '2025-04-10 09:00:00'),
+ (2, 'Evening Jog', 'Enjoyed an evening jog around the neighborhood.', 'Lifestyle', '2025-04-09 19:30:00'),
+ (3, 'New PR!', 'I set a new personal record in my 5K!', 'Achievement', '2025-04-08 07:15:00');
 
 
-INSERT INTO comments (post_id, user_id, content)
+INSERT INTO comments (post_id, user_id, content, created_at)
 VALUES
- (1, 2, 'Great job, keep it up!'),
- (2, 3, 'That looks fun!'),
- (3, 1, 'Congratulations on your PR!');
+ (1, 2, 'Great job, keep it up!', '2025-04-10 09:30:00'),
+ (2, 3, 'That looks fun!', '2025-04-09 20:00:00'),
+ (3, 1, 'Congratulations on your PR!', '2025-04-08 08:00:00');
 
 
 INSERT INTO `groups` (name, description)

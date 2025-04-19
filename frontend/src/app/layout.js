@@ -1,4 +1,3 @@
-
 import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/navbar/navbar";
 import "./globals.css";
@@ -26,7 +25,10 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
           <Navbar />
-          {children}
+          {/* Add pt-16 to push content below the fixed navbar */}
+          <main className="pt-20">
+            {children}
+          </main>
       </body>
     </html>
   );

@@ -1,13 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useSearchParams } from 'next/navigation'; // Import useSearchParams
+import { useSearchParams, useRouter } from 'next/navigation'; // Import useRouter
 
 export default function RunsPage() {
   const [runs, setRuns] = useState([]);
   const searchParams = useSearchParams(); // Get search params
   const userId = searchParams.get('userid'); // Get userId from query
   const [showModal, setShowModal] = useState(false); // State for modal visibility
+  const [showLoginModal, setShowLoginModal] = useState(false); // State for login prompt modal
+  const router = useRouter(); // Initialize useRouter
   const [formData, setFormData] = useState({ // State for form inputs
     distance: '',
     duration: '',
@@ -141,13 +143,24 @@ export default function RunsPage() {
     }
   };
 
+  // Function to handle the "Record Run" button click
+  const handleRecordRunClick = () => {
+    if (!userId) {
+      setShowLoginModal(true); // Show login prompt if user is not logged in
+    } else {
+      setShowModal(true); // Show run recording modal if user is logged in
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-light">
-      <main className="pt-20 pb-8">
+      {/* Remove pt-20 */}
+      <main className="pb-8">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-2xl font-bold">Running Log</h1>
-            <button onClick={() => setShowModal(true)} className="btn-strava">Record Activity</button>
+            {/* Updated onClick handler */}
+            <button onClick={handleRecordRunClick} className="btn-strava">Record Run</button>
           </div>
           <div className="stats-container mb-8">
             <div className="stat-card">
@@ -308,6 +321,32 @@ export default function RunsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for Sign in Prompt */}
+      {showLoginModal && (
+        <div className="fixed inset-0 flex justify-center items-center z-50 backdrop-blur-sm bg-black/10">
+          <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm border border-gray-300 text-center">
+            <h2 className="text-xl font-semibold mb-4">Sign In Required</h2>
+            <p className="mb-6">You need to be signed in to record a run.</p>
+            <div className="flex justify-center gap-4">
+              <button
+                type="button"
+                onClick={() => setShowLoginModal(false)}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push('/signin')} // Redirect to login page
+                className="btn-strava"
+              >
+                Sign in
+              </button>
+            </div>
           </div>
         </div>
       )}

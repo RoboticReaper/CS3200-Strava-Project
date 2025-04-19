@@ -9,49 +9,88 @@ from flask import jsonify
 from flask import make_response
 from flask import current_app
 from backend.db_connection import db
+from datetime import datetime # Import datetime
 
 #------------------------------------------------------------
 # Create a new Blueprint object, which is a collection of 
 # routes.
 posts = Blueprint('posts', __name__)
 
+# Helper function to format datetime objects in fetched data
+def format_datetime_in_data(data):
+    if not data:
+        return data
+    
+    formatted_data = []
+    for row in data:
+        formatted_row = dict(row) # Convert Row object to dictionary
+        if 'created_at' in formatted_row and isinstance(formatted_row['created_at'], datetime):
+            formatted_row['created_at'] = formatted_row['created_at'].isoformat()
+        # Add formatting for other datetime fields if necessary
+        formatted_data.append(formatted_row)
+    return formatted_data
+
 #------------------------------------------------------------
-# Get posts filtered by group membership
+# Get posts:
+# - If 'author_id' is provided, get all posts by that user.
+# - If 'user_id' is provided, get posts for that user's feed (from groups, excluding own).
+# - Otherwise, return error.
 @posts.route('/', methods=['GET'])
-def get_runs():
-    # Get the user ID from query parameters
-    requesting_user_id = request.args.get('user_id')
-
-    if not requesting_user_id:
-        return make_response(jsonify({'message': 'user_id query parameter is required'}), 400)
-
-    try:
-        # Ensure user_id is an integer
-        user_id = int(requesting_user_id)
-    except ValueError:
-        return make_response(jsonify({'message': 'Invalid user_id format'}), 400)
+def get_posts():
+    author_id_str = request.args.get('author_id')
+    user_id_str = request.args.get('user_id') # For feed filtering
 
     cursor = db.get_db().cursor()
-    # Select distinct posts where the post is in a group the user is a member of,
-    # AND the post was not created by the user.
-    # Use INNER JOIN for group related tables to only include posts shared within groups the user is part of.
-    cursor.execute('''
-        SELECT DISTINCT p.* 
-        FROM posts p
-        JOIN group_posts gp ON p.id = gp.post_id
-        JOIN group_membership gm ON gp.group_id = gm.group_id
-        WHERE gm.user_id = %s AND p.user_id != %s
-    ''', (user_id, user_id)) # Pass user_id twice
+    theData = []
 
-    # Python Dictionary
-    theData = cursor.fetchall()
+    if author_id_str:
+        # Fetch posts by a specific author
+        try:
+            author_id = int(author_id_str)
+            cursor.execute('''
+                SELECT * 
+                FROM posts 
+                WHERE user_id = %s
+                ORDER BY created_at DESC
+            ''', (author_id,))
+            theData = cursor.fetchall()
+        except ValueError:
+            return make_response(jsonify({'message': 'Invalid author_id format'}), 400)
+        except Exception as e:
+            current_app.logger.error(f"Error fetching posts by author: {e}")
+            return make_response(jsonify({'message': 'Error fetching posts'}), 500)
 
-    # Create a HTTP Response object and add results of the query to it
-    # after "jasonify"-ing it.
-    response = make_response(jsonify(theData))
-    # set the proper HTTP Status code of 200 (meaning all good)
+    elif user_id_str:
+        # Fetch posts for a user's feed (current logic)
+        try:
+            user_id = int(user_id_str)
+            # Select distinct posts where the post is in a group the user is a member of,
+            # AND the post was not created by the user.
+            cursor.execute('''
+                SELECT DISTINCT p.* 
+                FROM posts p
+                JOIN group_posts gp ON p.id = gp.post_id
+                JOIN group_membership gm ON gp.group_id = gm.group_id
+                WHERE gm.user_id = %s AND p.user_id != %s
+                ORDER BY p.created_at DESC
+            ''', (user_id, user_id))
+            theData = cursor.fetchall()
+        except ValueError:
+            return make_response(jsonify({'message': 'Invalid user_id format'}), 400)
+        except Exception as e:
+            current_app.logger.error(f"Error fetching user feed posts: {e}")
+            return make_response(jsonify({'message': 'Error fetching posts'}), 500)
+            
+    else:
+        # Neither author_id nor user_id provided
+        return make_response(jsonify({'message': 'Either author_id or user_id query parameter is required'}), 400)
+
+    # Format datetime fields for the fetched data
+    formatted_data = format_datetime_in_data(theData)
+
+    # Create a HTTP Response object
+    response = make_response(jsonify(formatted_data))
     response.status_code = 200
-    # send the response back to the client
     return response
 
 # Get posts by post_id
@@ -63,10 +102,13 @@ def get_post_by_id(post_id):
 
     # Python Dictionary
     theData = cursor.fetchall()
+    
+    # Format datetime fields
+    formatted_data = format_datetime_in_data(theData)
 
     # Create a HTTP Response object and add results of the query to it
     # after "jasonify"-ing it.
-    response = make_response(jsonify(theData))
+    response = make_response(jsonify(formatted_data)) # Use formatted data
     # set the proper HTTP Status code of 200 (meaning all good)
     response.status_code = 200
     # send the response back to the client
@@ -77,14 +119,18 @@ def get_post_by_id(post_id):
 def get_comments_on_post(post_id):
     cursor = db.get_db().cursor()
     cursor.execute('''SELECT * FROM comments WHERE post_id = %s
+                      ORDER BY created_at ASC -- Optional: Order comments chronologically
                    ''', (post_id,))
 
     # Python Dictionary
     theData = cursor.fetchall()
+    
+    # Format datetime fields
+    formatted_data = format_datetime_in_data(theData)
 
     # Create a HTTP Response object and add results of the query to it
     # after "jasonify"-ing it.
-    response = make_response(jsonify(theData))
+    response = make_response(jsonify(formatted_data)) # Use formatted data
     # set the proper HTTP Status code of 200 (meaning all good)
     response.status_code = 200
     # send the response back to the client
@@ -99,10 +145,13 @@ def get_single_comment(post_id, comment_id):
 
     # Python Dictionary
     theData = cursor.fetchall()
+    
+    # Format datetime fields
+    formatted_data = format_datetime_in_data(theData)
 
     # Create a HTTP Response object and add results of the query to it
     # after "jasonify"-ing it.
-    response = make_response(jsonify(theData))
+    response = make_response(jsonify(formatted_data)) # Use formatted data
     # set the proper HTTP Status code of 200 (meaning all good)
     response.status_code = 200
     # send the response back to the client

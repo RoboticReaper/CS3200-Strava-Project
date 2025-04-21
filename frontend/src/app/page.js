@@ -117,7 +117,7 @@ export default function Home() {
                             </div>
                           </div>
                           <Link
-                            href={`/map?id=${r.id}&userid=${userId}`}
+                            href={`/map?id=1&userid=${userId}`}
                             className="text-accent-blue hover:underline"
                           >
                             View Map

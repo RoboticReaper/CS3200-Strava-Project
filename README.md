@@ -1,5 +1,18 @@
 Video Demo: https://youtu.be/_83FjyA5a4g
 
+# Instructions to Run Locally
+Create a .env file in /api (read more in /database-files/README.md)
+
+```sh
+docker compose up --build
+```
+open http://localhost:3001
+
+
+# Project Overview
+Stridez is a running app that allows users to record their runs as well as its location to create maps of runs. The app also contains as a social feature with posts, comments, groups, and friends.
+
+
 # Spring 2025 CS 3200 Project Template Repository
 
 This repo is a template for your semester project. It includes most of the infrastructure setup (containers), sample databases, and example UI pages. Explore it fully and ask questions!
